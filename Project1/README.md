@@ -1,6 +1,12 @@
 ### Instructions for running code
 
-Before running the scripts, there are a few python packages that are required. First make sure you have installed Matplotlib.pyplot and Numpy. This is either done through Anaconda, or by using Homebrew/Pip. I use the following versions:
+Before running the scripts, there are a few python packages that are required. First make sure you have installed Matplotlib.pyplot and Numpy. This is either done through Anaconda, or by using Homebrew/Pip as shown below:
+```
+pip install numpy
+brew install numpy
+```
+
+I use the following versions:
 ```
 numpy 1.19.4  
 matplotlib 3.3.3  
