@@ -147,7 +147,7 @@ xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
 #Run simulation
 
 def run():
-    #bar = Bar('Processing', max=inter)
+    bar = Bar('Processing', max=inter)
 
     for iom,om_m in enumerate(omega_mo):
         for iow,om_w in enumerate(omega_wo):
@@ -157,8 +157,8 @@ def run():
             else:
                 xi2val[iow, iom] = np.nan
 
-        #bar.next()
-    #bar.finish()
+        bar.next()
+    bar.finish()
 
 run()
 
@@ -174,7 +174,7 @@ plt.contourf(X,Y,np.log10(xi2val),cmap=cmap)
 plt.colorbar()
 plt.xlabel(r"$\Omega_{m 0}$")
 plt.ylabel(r"$\Omega_{w 0}$")
-plt.savefig("totxi2_6.jpeg")
+plt.savefig("images/totxi2_6.jpeg")
 plt.show()
 
 file.close()
@@ -196,7 +196,7 @@ plt.colorbar()
 plt.xlabel(r"$\Omega_{m 0}$")
 plt.ylabel(r"$\Omega_{w 0}$")
 
-plt.savefig("95%xi2_6.jpeg")
+plt.savefig("images/95%xi2_6.jpeg")
 plt.show()
 
 file.close()
