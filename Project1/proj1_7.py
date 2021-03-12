@@ -180,7 +180,7 @@ plt.contourf(X,Y,np.log10(xi2val),cmap=cmap)
 plt.colorbar()
 plt.xlabel(r"$\Omega_{w 0}$")
 plt.ylabel("w")
-plt.savefig("xi2_7.jpeg")
+plt.savefig("images/xi2_7.jpeg")
 plt.show()
 
 file.close()
