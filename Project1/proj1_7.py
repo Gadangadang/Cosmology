@@ -202,7 +202,7 @@ plt.colorbar()
 plt.xlabel(r"$\Omega_{w 0}$")
 plt.ylabel("w")
 
-plt.savefig("95%xi2_7.jpeg")
+plt.savefig("images/95%xi2_7.jpeg")
 plt.show()
 
 file.close()
