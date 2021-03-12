@@ -8,8 +8,8 @@ def E(x):
     return 1 - omega_m - omega_w + x - x
 
 x = np.linspace(0.001,1,100)
-omega_m = 0
-omega_w = 1
+omega_m = 0.24
+omega_w = 0.64
 
 plt.plot(x,U(x), label = 'U')
 plt.plot(x, E(x), label = 'E')
