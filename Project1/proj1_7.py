@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from scipy.constants import c
 from progress.bar import Bar
 import scipy.integrate as integrate
-import sys
 
 #Read from file
 
@@ -50,7 +49,8 @@ h0 = (70*1000/factor2)#1/s^2
 def a(z):
     return a_0/(1+z)
 
-def bigbang_test(z,omega_m, omega_w):
+def bigbang_test(z,omega_w, w):
+    global omega_m
     omega_ko = 1 - omega_m - omega_w
     Hh_0 = h0*np.sqrt(omega_m*(1+z)**3 + omega_ko*(1+z)**2 + omega_w*(1+z)**(3*(1+w)))**2
 
@@ -72,7 +72,8 @@ def S(k,i):
 
 
 
-def r(redshift, omega_ko, omega_m, omega_w):
+def r(redshift, omega_ko, w, omega_w):
+    global omega_m
 
     def integral(H, z):
 
@@ -115,7 +116,7 @@ def r(redshift, omega_ko, omega_m, omega_w):
 
 
 
-def lum_model(z,omega_m, omega_w):
+def lum_model(z,w, omega_w):
     global redshift
     global size
     omega_ko = 1 - omega_m - omega_w
@@ -123,44 +124,49 @@ def lum_model(z,omega_m, omega_w):
     if omega_ko == 0:
         dl = c*( 1+z )/(h0) * r( redshift, omega_ko, omega_m, omega_w  )
     else:
-        dl = c*( 1+z )/(h0*np.sqrt(np.abs(omega_ko))) * r( redshift, omega_ko, omega_m, omega_w  )
+        dl = c*( 1+z )/(h0*np.sqrt(np.abs(omega_ko))) * r( redshift, omega_ko, w, omega_w  )
 
     return dl
 
-def xi2(z,omega_m, omega_w):
+def xi2(z,w, omega_w):
 
-    xi2 = np.sum( ( lumdist - lum_model(z,omega_m, omega_w) )**2/lumdist_err**2 )
+    xi2 = np.sum( ( lumdist - lum_model(z,w, omega_w) )**2/lumdist_err**2 )
     return xi2
 
 size = len(redshift)
 
 inter = 300
+omega_m = 0.3
+omega_wo = np.linspace(-2,3,inter)
+w = np.linspace(-1.5,-0.5,inter)
 
-omega_mo = np.linspace(0,1.5,inter)
-omega_wo = np.linspace(0,1.5,inter)
-
-X,Y = np.meshgrid(omega_mo, omega_wo)
-xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
-
-
+X,Y = np.meshgrid(omega_wo, w)
+xi2val = np.zeros( ( len(omega_wo),len(w) ) )
 
 #Run simulation
 
 def run():
     #bar = Bar('Processing', max=inter)
 
-    for iom,om_m in enumerate(omega_mo):
+    for iw,w_val in enumerate(w):
         for iow,om_w in enumerate(omega_wo):
-            if bigbang_test(redshift, om_m, om_w) is True:
-                val = xi2(redshift, om_m, om_w)
-                xi2val[iow, iom] = val
+            if bigbang_test(redshift, om_w, w_val) is True:
+                val = xi2(redshift, w_val, om_w)
+                xi2val[iow, iw] = val
+
+
             else:
-                xi2val[iow, iom] = np.nan
+                print("p")
+                xi2val[iow, iw] = np.nan
+
 
         #bar.next()
     #bar.finish()
 
 run()
+
+
+
 
 xi2val = xi2val - np.nanmin(xi2val)
 #rint(xi2val)
@@ -172,31 +178,31 @@ cmap.set_bad('black',1.)
 plt.contourf(X,Y,np.log10(xi2val),cmap=cmap)
 
 plt.colorbar()
-plt.xlabel(r"$\Omega_{m 0}$")
-plt.ylabel(r"$\Omega_{w 0}$")
-plt.savefig("totxi2_6.jpeg")
+plt.xlabel(r"$\Omega_{w 0}$")
+plt.ylabel("w")
+plt.savefig("xi2_7.jpeg")
 plt.show()
 
 file.close()
 
-# 95% range
-index = np.where(xi2val - np.nanmin(xi2val) < 6.17, xi2val, np.nan)
+# 95%
 
+index = np.where( xi2val - np.nanmin(xi2val) < 6.17, xi2val, np.nan )
+#rint(xi2val)
 
-#sys.exit()
+#print(np.min(xi2val))
 
 
 
 cmap = plt.cm.coolwarm
 cmap.set_bad('black',1.)
 plt.contourf(X,Y,np.log10(index),cmap=cmap)
-plt.tight_layout()
+
 plt.colorbar()
+plt.xlabel(r"$\Omega_{w 0}$")
+plt.ylabel("w")
 
-plt.xlabel(r"$\Omega_{m 0}$")
-plt.ylabel(r"$\Omega_{w 0}$")
-
-plt.savefig("95%xi2_6.jpeg")
+plt.savefig("95%xi2_7.jpeg")
 plt.show()
 
 file.close()
