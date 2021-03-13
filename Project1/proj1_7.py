@@ -152,7 +152,7 @@ def run():
         for iow,om_w in enumerate(omega_wo):
             if bigbang_test(redshift, om_w, w_val) is True:
                 val = xi2(redshift, w_val, om_w)
-                xi2val[iow, iw] = val
+                xi2val[iw, iow] = val
 
 
             else:
