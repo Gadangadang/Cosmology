@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.constants import c
-from progress.bar import Bar
+#from progress.bar import Bar
 import scipy.integrate as integrate
 import sys
+
 
 #Read from file
 
@@ -147,7 +148,7 @@ xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
 #Run simulation
 
 def run():
-    bar = Bar('Processing', max=inter)
+    #bar = Bar('Processing', max=inter)
 
     for iom,om_m in enumerate(omega_mo):
         for iow,om_w in enumerate(omega_wo):
@@ -157,8 +158,8 @@ def run():
             else:
                 xi2val[iow, iom] = np.nan
 
-        bar.next()
-    bar.finish()
+        #bar.next()
+    #bar.finish()
 
 run()
 
