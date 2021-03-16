@@ -37,7 +37,6 @@ lumdist_err = np.asarray(lumdist_err)*factor1  #meter
 
 w = -1
 ci = c
-a_0 = 1
 h0 = (70*1000/factor2)#1/s^2
 
 
@@ -47,11 +46,25 @@ h0 = (70*1000/factor2)#1/s^2
 #Functions for analysis
 
 
-
-def a(z):
-    return a_0/(1+z)
-
 def bigbang_test(z,omega_m, omega_w):
+    """
+    Check if H^2 < 0
+
+    Parameters
+    -----------
+
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_m : float
+      Omega_m0 value
+    omega_w : float
+      Omega_w0 value
+
+    Returns
+    -------
+    True if H^2 > 0
+    False if H^2 < 0
+    """
     omega_ko = 1 - omega_m - omega_w
     Hh_0 = h0*np.sqrt(omega_m*(1+z)**3 + omega_ko*(1+z)**2 + omega_w*(1+z)**(3*(1+w)))**2
 
@@ -62,6 +75,22 @@ def bigbang_test(z,omega_m, omega_w):
         return False
 
 def S(k,i):
+    """
+    Calculate S_k(i)
+
+    Parameters
+    -----------
+
+    k : int
+      Spatial curvature parameter
+    i : {array-like}, shape = [z_samples]
+
+    Returns
+    -------
+    sin(i), for k = 1
+    i, for k = 0
+    sinh(i), for k = -1
+    """
     if k == 1:
         return np.sin(i)
     elif k == 0:
@@ -74,10 +103,41 @@ def S(k,i):
 
 
 def r(redshift, omega_ko, omega_m, omega_w):
+    """
+    Calculate r integral
+
+    Parameters
+    -----------
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_k0 : float
+      omega_k0 value to calculate r integral
+    omega_m : float
+      omega_m value to calculate r integral
+    omega_w : float
+      omega_w value to calculate integral
+
+    Returns
+    -------
+    r values
+
+    """
 
     def integral(H, z):
+        """
+        Calculate integral from 0 to z
 
+        Parameters
+        -----------
+        H : func
+          function for calculating expansion rate
+        z : {array-like}, shape = [z_samples]
+          Redshift values, read from file
 
+        Returns
+        -------
+        res : integral values
+        """
         # Do the integral for all input z
         Nz  = len(z) # Length of z
         res = np.zeros(Nz)
@@ -96,6 +156,18 @@ def r(redshift, omega_ko, omega_m, omega_w):
         return res
 
     def H(z):
+        """
+        Calculate 1/H as a function of z, used in r calculation
+
+        Parameters
+        -----------
+        z : {array-like}, shape = [z_samples]
+          Redshift values, read from file
+
+        Returns
+        -------
+        1/H
+        """
 
         h = h0*np.sqrt(omega_m*(1+z)**3 + omega_ko*(1+z)**2 + omega_w*(1+z)**(3*(1+w)))
         return 1/h
@@ -117,8 +189,23 @@ def r(redshift, omega_ko, omega_m, omega_w):
 
 
 def lum_model(z,omega_m, omega_w):
-    global redshift
-    global size
+    """
+    Calculate luminosity distance
+
+    Parameters
+    -----------
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_m : float
+      omega_m value to calculate luminosity distance
+    omega_w : float
+      omega_w value to calculate luminosity distance
+
+    Returns
+    -------
+    dl : luminosity distance
+
+    """
     omega_ko = 1 - omega_m - omega_w
 
     if omega_ko == 0:
@@ -129,12 +216,30 @@ def lum_model(z,omega_m, omega_w):
     return dl
 
 def xi2(z,omega_m, omega_w):
+    """
+    Calculate chi^2
+
+    Parameters
+    -----------
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_m : float
+      omega_m value to calculate xi2
+    omega_w : float
+      omega_w value to calculate xi2
+
+    Returns
+    -------
+    xi2
+
+    """
 
     xi2 = np.sum( ( lumdist - lum_model(z,omega_m, omega_w) )**2/lumdist_err**2 )
     return xi2
 
-size = len(redshift)
 
+# Set grid for computing a contourf plot
+size = len(redshift)
 inter = 700
 
 omega_mo = np.linspace(0,1.5,inter)
@@ -147,7 +252,7 @@ xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
 
 #Run simulation
 #Remove hashtag in the run function as well as in
-#the package section to have progress bar in terminal 
+#the package section to have progress bar in terminal
 
 
 def run():
@@ -167,9 +272,9 @@ def run():
 run()
 
 xi2val = xi2val - np.nanmin(xi2val)
-#rint(xi2val)
 
-#print(np.min(xi2val))
+
+#Plot code
 
 cmap = plt.cm.coolwarm
 cmap.set_bad('black',1.)
@@ -188,8 +293,6 @@ index = np.where(xi2val - np.nanmin(xi2val) < 6.17, xi2val, np.nan)
 
 
 #sys.exit()
-
-
 
 cmap = plt.cm.coolwarm
 cmap.set_bad('black',1.)

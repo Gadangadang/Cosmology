@@ -5,6 +5,22 @@ import scipy.integrate as integrate
 import sys
 
 def S(k,i):
+    """
+    Calculate S_k(i)
+
+    Parameters
+    -----------
+
+    k : int
+      Spatial curvature parameter
+    i : {array-like}, shape = [z_samples]
+
+    Returns
+    -------
+    sin(i), for k = 1
+    i, for k = 0
+    sinh(i), for k = -1
+    """
     if k == 1:
         return np.sin(i)
     elif k == 0:
@@ -15,11 +31,42 @@ def S(k,i):
 
 
 def r(redshift, omega_ko, omega_m, omega_w):
+    """
+    Calculate r integral
 
+    Parameters
+    -----------
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_k0 : float
+      omega_k0 value to calculate r integral
+    omega_m : float
+      omega_m value to calculate r integral
+    omega_w : float
+      omega_w value to calculate integral
+
+    Returns
+    -------
+    r values
+
+    """
 
 
     def integral(H, z):
+        """
+        Calculate integral from 0 to z
 
+        Parameters
+        -----------
+        H : func
+          function for calculating expansion rate
+        z : {array-like}, shape = [z_samples]
+          Redshift values, read from file
+
+        Returns
+        -------
+        res : integral values
+        """
 
         # Do the integral for all input z
         Nz  = len(z) # Length of z
@@ -39,6 +86,18 @@ def r(redshift, omega_ko, omega_m, omega_w):
         return res
 
     def H(z):
+        """
+        Calculate 1/H as a function of z, used in r calculation
+
+        Parameters
+        -----------
+        z : {array-like}, shape = [z_samples]
+          Redshift values, read from file
+
+        Returns
+        -------
+        1/H
+        """
         h = h0*np.sqrt(omega_m*(1+z)**3 + omega_ko*(1+z)**2 + omega_w*(1+z)**(3*(1+w)))
         return 1/h
 
@@ -58,6 +117,23 @@ def r(redshift, omega_ko, omega_m, omega_w):
 
 
 def lum_model(z,omega_m, omega_w):
+    """
+    Calculate luminosity distance
+
+    Parameters
+    -----------
+    z : {array-like}, shape = [z_samples]
+      Redshift values, read from file
+    omega_m : float
+      omega_m value to calculate luminosity distance
+    omega_w : float
+      omega_w value to calculate luminosity distance
+
+    Returns
+    -------
+    dl : luminosity distance
+
+    """
     omega_ko = 1 - omega_m - omega_w
 
     if omega_ko == 0:
