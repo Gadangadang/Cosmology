@@ -135,10 +135,10 @@ def xi2(z,omega_m, omega_w):
 
 size = len(redshift)
 
-inter = 300
+inter = 700
 
 omega_mo = np.linspace(0,1.5,inter)
-omega_wo = np.linspace(0,1.5,inter)
+omega_wo = np.linspace(-2,3,inter)
 
 X,Y = np.meshgrid(omega_mo, omega_wo)
 xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
@@ -146,6 +146,9 @@ xi2val = np.zeros( ( len(omega_mo),len(omega_wo) ) )
 
 
 #Run simulation
+#Remove hashtag in the run function as well as in
+#the package section to have progress bar in terminal 
+
 
 def run():
     #bar = Bar('Processing', max=inter)

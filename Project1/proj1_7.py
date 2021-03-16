@@ -144,6 +144,8 @@ X,Y = np.meshgrid(omega_wo, w)
 xi2val = np.zeros( ( len(omega_wo),len(w) ) )
 
 #Run simulation
+#Remove hashtag in the run function as well as in
+#the package section to have progress bar in terminal 
 
 def run():
     #bar = Bar('Processing', max=inter)
