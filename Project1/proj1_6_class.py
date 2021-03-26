@@ -82,7 +82,7 @@ class CosmoProject1:
 
         k : int
           Spatial curvature parameter
-        i : {array-like}, shape = [z_samples]
+        i : {array-like}, shape = [redshift]
 
         Returns
         -------
@@ -141,7 +141,7 @@ class CosmoProject1:
 
         h = self.h0*np.sqrt(self.current_omega_m*(1+z)**3\
                           + self.current_omega_k*(1+z)**2\
-                          + self.current_omega_w*(1+z)**(3*(1+self.w)))**2
+                          + self.current_omega_w*(1+z)**(3*(1+self.w)))
         return 1/h
 
 
