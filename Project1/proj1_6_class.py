@@ -32,7 +32,6 @@ class CosmoProject1:
         lumdist = []
         lumdist_err = []
 
-
         for line in file:
 
             if len(line.split()) < 4 and len(line.split()) > 1:
@@ -63,15 +62,18 @@ class CosmoProject1:
         False if H^2 < 0
         """
 
-        Hh_0 = self.h0*np.sqrt(self.current_omega_m*(1+self.redshift)**3\
-                               + self.current_omega_k*(1+self.redshift)**2\
-                               + self.current_omega_w*(1+self.redshift)**(3*(1+self.w)))**2
-
+        Hh_0 = self.h0*np.sqrt(self.current_omega_m \
+                               * (1+self.redshift)**3\
+                               + self.current_omega_k \
+                               * (1+self.redshift)**2\
+                               + self.current_omega_w \
+                               * (1+self.redshift)**(3*(1+self.w)))**2
 
         if Hh_0.all() > 0:
             return True
         else:
             return False
+            
 
     def S(self, k,i):
         """
@@ -139,9 +141,9 @@ class CosmoProject1:
         1/H
         """
 
-        h = self.h0*np.sqrt(self.current_omega_m*(1+z)**3\
-                          + self.current_omega_k*(1+z)**2\
-                          + self.current_omega_w*(1+z)**(3*(1+self.w)))
+        h = self.h0*np.sqrt(self.current_omega_m * (1+z)**3\
+                            + self.current_omega_k * (1+z)**2\
+                            + self.current_omega_w * (1+z)**(3 * (1+self.w)))
         return 1/h
 
 
@@ -189,12 +191,13 @@ class CosmoProject1:
             lumdist_model = self.ci * ( 1+self.redshift )/(self.h0)\
                               * self.r()
         else:
+            h0_sqrt_omega_k = self.h0*np.sqrt(np.abs(self.current_omega_k))
+
             lumdist_model = self.ci * ( 1+self.redshift )\
-                              / (self.h0*np.sqrt(np.abs(self.current_omega_k)))\
-                              * self.r()
+                              / h0_sqrt_omega_k * self.r()
 
 
-        xi2 = np.sum( ( self.lumdist - lumdist_model )**2/self.lumdist_err**2 )
+        xi2 = np.sum(( self.lumdist - lumdist_model )**2/self.lumdist_err**2)
         return xi2
 
     def find_optimal_parameter_combination(self):
@@ -220,6 +223,7 @@ class CosmoProject1:
 
         for iom,om_m in enumerate(omega_mo):
             self.current_omega_m = om_m
+
             for iow,om_w in enumerate(omega_wo):
 
                 self.current_omega_w = om_w
@@ -275,6 +279,6 @@ class CosmoProject1:
 
 
 if "__main__" == __name__:
-    Omega = CosmoProject1()
+    Omega = CosmoProject1(N=40)
     Omega.read_file("sndata.txt")
     Omega.find_optimal_parameter_combination()
