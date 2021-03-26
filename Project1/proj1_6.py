@@ -240,7 +240,7 @@ def xi2(z,omega_m, omega_w):
 
 # Set grid for computing a contourf plot
 size = len(redshift)
-inter = 700
+inter = 200
 
 omega_mo = np.linspace(0,1.5,inter)
 omega_wo = np.linspace(-2,3,inter)
