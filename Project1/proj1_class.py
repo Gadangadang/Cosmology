@@ -69,7 +69,8 @@ class CosmoProject1:
                                + self.current_omega_k \
                                * (1+self.redshift)**2\
                                + self.current_omega_w \
-                               * (1+self.redshift)**(3*(1+self.current_w)))**2
+                               * (1+self.redshift)\
+                               **(3*(1+self.current_w)))**2
 
         if Hh_0.all() > 0:
             return True
@@ -145,7 +146,8 @@ class CosmoProject1:
 
         h = self.h0*np.sqrt(self.current_omega_m * (1+z)**3\
                             + self.current_omega_k * (1+z)**2\
-                            + self.current_omega_w * (1+z)**(3 * (1+self.current_w)))
+                            + self.current_omega_w * (1+z)\
+                            **(3 * (1+self.current_w)))
         return 1/h
 
 
@@ -198,9 +200,9 @@ class CosmoProject1:
             lumdist_model = self.ci * ( 1+self.redshift )\
                               / h0_sqrt_omega_k * self.r()
 
-
         xi2 = np.sum(( self.lumdist - lumdist_model )**2/self.lumdist_err**2)
         return xi2
+
 
     def find_optimal_parameter_omega_w_omega_m_combination(self):
         """
@@ -231,12 +233,6 @@ class CosmoProject1:
                 self.current_omega_w = om_w
                 self.current_omega_k = 1 - self.current_omega_m\
                                          - self.current_omega_w
-
-                """
-                print("o_m = ", self.current_omega_m)
-                print("o_w = ", self.current_omega_w)
-                print("o_k = ", self.current_omega_k)"""
-
 
                 if self.bigbang_test() is True:
                     val = self.x_i2()
@@ -306,12 +302,6 @@ class CosmoProject1:
                 self.current_omega_w = om_w
                 self.current_omega_k = 1 - self.current_omega_m\
                                          - self.current_omega_w
-
-                """
-                print("o_m = ", self.current_omega_m)
-                print("o_w = ", self.current_omega_w)
-                print("o_k = ", self.current_omega_k)"""
-
 
                 if self.bigbang_test() is True:
                     val = self.x_i2()
