@@ -17,8 +17,10 @@ class CosmoProject1:
         self.omega_m_max = 1.5
         self.omega_w_min = -2
         self.omega_w_max = 3
+        self.w_min = -1.5
+        self.w_max = -0.5
 
-        self.w = -1
+
         self.ci = c
         self.h0 = (70*1000/self.factor2)#1/s^2
 
@@ -67,13 +69,13 @@ class CosmoProject1:
                                + self.current_omega_k \
                                * (1+self.redshift)**2\
                                + self.current_omega_w \
-                               * (1+self.redshift)**(3*(1+self.w)))**2
+                               * (1+self.redshift)**(3*(1+self.current_w)))**2
 
         if Hh_0.all() > 0:
             return True
         else:
             return False
-            
+
 
     def S(self, k,i):
         """
@@ -143,7 +145,7 @@ class CosmoProject1:
 
         h = self.h0*np.sqrt(self.current_omega_m * (1+z)**3\
                             + self.current_omega_k * (1+z)**2\
-                            + self.current_omega_w * (1+z)**(3 * (1+self.w)))
+                            + self.current_omega_w * (1+z)**(3 * (1+self.current_w)))
         return 1/h
 
 
@@ -200,14 +202,14 @@ class CosmoProject1:
         xi2 = np.sum(( self.lumdist - lumdist_model )**2/self.lumdist_err**2)
         return xi2
 
-    def find_optimal_parameter_combination(self):
+    def find_optimal_parameter_omega_w_omega_m_combination(self):
         """
         Finds the optimal combination of omega_w and omega_m by plotting the
         likelyhood that the combination is the true combination
 
         """
 
-
+        self.current_w = -1
         omega_mo = np.linspace(self.omega_m_min, self.omega_m_max, self.inter)
         omega_wo = np.linspace(self.omega_w_min, self.omega_w_max, self.inter)
 
@@ -275,10 +277,85 @@ class CosmoProject1:
         plt.savefig("images/95%xi2_6.jpeg")
         plt.show()
 
+    def find_optimal_parameter_w_omega_w_combination(self):
+        """
+        Finds the optimal combination of omega_w and omega_m by plotting the
+        likelyhood that the combination is the true combination
+
+        """
+
+        self.current_omega_m = 0.3
+        w = np.linspace(self.w_min, self.w_max, self.inter)
+        omega_wo = np.linspace(self.omega_w_min, self.omega_w_max, self.inter)
+
+        X,Y = np.meshgrid(omega_wo, w)
+        self.xi2val = np.zeros( ( self.inter, self.inter ) )
+
+
+        #Run simulation
+        #Remove hashtag in the run function as well as in
+        #the package section to have progress bar in terminal
+
+        #bar = Bar('Processing', max=self.inter)
+
+        for iw,w_val in enumerate(w):
+            self.current_w = w_val
+
+            for iow,om_w in enumerate(omega_wo):
+
+                self.current_omega_w = om_w
+                self.current_omega_k = 1 - self.current_omega_m\
+                                         - self.current_omega_w
+
+                """
+                print("o_m = ", self.current_omega_m)
+                print("o_w = ", self.current_omega_w)
+                print("o_k = ", self.current_omega_k)"""
+
+
+                if self.bigbang_test() is True:
+                    val = self.x_i2()
+                    self.xi2val[iw, iow] = val
+                else:
+                    self.xi2val[iw, iow] = np.nan
+
+
+
+        self.xi2val = self.xi2val - np.nanmin(self.xi2val)
+
+        cmap = plt.cm.coolwarm
+        cmap.set_bad('black',1.)
+        plt.contourf(X,Y,np.log10(self.xi2val),cmap=cmap)
+
+        plt.colorbar()
+        plt.xlabel(r"$\Omega_{m 0}$")
+        plt.ylabel(r"$\Omega_{w 0}$")
+        plt.savefig("images/totxi2_7.jpeg")
+        plt.show()
+
+
+
+        # 95% range
+        index = np.where(self.xi2val - np.nanmin(self.xi2val) < 6.17,\
+                         self.xi2val, np.nan)
+
+        cmap = plt.cm.coolwarm
+        cmap.set_bad('black',1.)
+        plt.contourf(X,Y,np.log10(index),cmap=cmap)
+        plt.tight_layout()
+        plt.colorbar()
+
+        plt.xlabel(r"$\Omega_{m 0}$")
+        plt.ylabel(r"$\Omega_{w 0}$")
+
+        plt.savefig("images/95%xi2_7.jpeg")
+        plt.show()
+
 
 
 
 if "__main__" == __name__:
     Omega = CosmoProject1(N=40)
     Omega.read_file("sndata.txt")
-    Omega.find_optimal_parameter_combination()
+    Omega.find_optimal_parameter_omega_w_omega_m_combination()
+    Omega.find_optimal_parameter_w_omega_w_combination()
