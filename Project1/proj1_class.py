@@ -6,6 +6,7 @@ import scipy.integrate as integrate
 import sys
 
 
+
 class CosmoProject1:
     def __init__(self, N=200):
 
@@ -19,7 +20,6 @@ class CosmoProject1:
         self.omega_w_max = 3
         self.w_min = -1.5
         self.w_max = -0.5
-
 
         self.ci = c
         self.h0 = (70*1000/self.factor2)#1/s^2
@@ -64,12 +64,12 @@ class CosmoProject1:
         False if H^2 < 0
         """
 
-        Hh_0 = self.h0*np.sqrt(self.current_omega_m \
-                               * (1+self.redshift)**3\
+        Hh_0 = self.h0*np.sqrt(self.current_omega_m   \
+                               * (1+self.redshift)**3 \
                                + self.current_omega_k \
-                               * (1+self.redshift)**2\
+                               * (1+self.redshift)**2 \
                                + self.current_omega_w \
-                               * (1+self.redshift)\
+                               * (1+self.redshift)    \
                                **(3*(1+self.current_w)))**2
 
         if Hh_0.all() > 0:
@@ -144,9 +144,9 @@ class CosmoProject1:
         1/H
         """
 
-        h = self.h0*np.sqrt(self.current_omega_m * (1+z)**3\
-                            + self.current_omega_k * (1+z)**2\
-                            + self.current_omega_w * (1+z)\
+        h = self.h0*np.sqrt(self.current_omega_m * (1+z)**3   \
+                            + self.current_omega_k * (1+z)**2 \
+                            + self.current_omega_w * (1+z)    \
                             **(3 * (1+self.current_w)))
         return 1/h
 
@@ -348,4 +348,4 @@ if "__main__" == __name__:
     Omega = CosmoProject1(N=40)
     Omega.read_file("sndata.txt")
     Omega.find_optimal_parameter_omega_w_omega_m_combination()
-    Omega.find_optimal_parameter_w_omega_w_combination()
+    #Omega.find_optimal_parameter_w_omega_w_combination()
