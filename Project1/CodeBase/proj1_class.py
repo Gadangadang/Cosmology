@@ -348,4 +348,4 @@ if "__main__" == __name__:
     Omega = CosmoProject1(N=40)
     Omega.read_file("sndata.txt")
     Omega.find_optimal_parameter_omega_w_omega_m_combination()
-    #Omega.find_optimal_parameter_w_omega_w_combination()
+    Omega.find_optimal_parameter_w_omega_w_combination()
