@@ -107,6 +107,7 @@ class TemperatureTable:
 
         plt.scatter(self.x(self.Temp), self.Splot, label="S(x)")
         plt.legend()
+        plt.savefig("Images/s_x.jpeg")
         plt.show()
 
 
