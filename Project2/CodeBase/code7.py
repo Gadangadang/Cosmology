@@ -7,6 +7,7 @@ from scipy.misc import derivative
 
 
 class TemperatureTable:
+
     def __init__(self, T):
         """
         Initialize class variables and
@@ -25,16 +26,59 @@ class TemperatureTable:
         self.Splot = np.zeros_like(self.Temp)
 
     def inteS_x(self, y, x):
+        """
+        Algebraic expression inside integral in S(x)
+
+        Parameters
+        -----------
+
+        y : float
+          Integral parameter
+        x : float
+          constant given as mc^2/kT
+
+        Returns
+        -------
+        Expression
+        """
         return y**2 * (np.sqrt( x**2 + y**2 ) + y**2 \
                / ( 3 * np.sqrt( x**2 + y**2 ))) \
                / ( np.exp( np.sqrt( x**2 + y**2 )) + 1 )
 
     def inteE_x(self, y, x):
+        """
+        Algebraic expression inside integral in E(x)
+
+        Parameters
+        -----------
+
+        y : float
+          Integral parameter
+        x : float
+          constant given as mc^2/kT
+
+        Returns
+        -------
+        Expression
+        """
         return y**2 * (np.sqrt(x**2 + y**2)) \
                / (np.exp( np.sqrt(x**2 + y**2) ) + 1)
 
 
     def epsilon(self, x):
+        """
+        Calculate E(x)
+
+        Parameters
+        -----------
+
+        x : float
+          constant given as mc^2/kT
+
+        Returns
+        -------
+        Solved integral
+        """
         epint = 30/np.pi**4 * float(intp.quad(self.inteE_x,
                                               0,
                                               np.inf,
@@ -44,16 +88,68 @@ class TemperatureTable:
         return epsi
 
     def t_int_x(self, x):
-        return (3 - x*derivative(self.S,x)/self.S(x))*self.epsilon(x)**(-1/2)*x
+        """
+        Algebraic expression inside integral in t(s)
+
+        Parameters
+        -----------
+
+        x : float
+          constant given as mc^2/kT
+
+        Returns
+        -------
+        Expression
+        """
+        return (3 - x*derivative(self.S,x)\
+                /self.S(x))*self.epsilon(x)**(-1/2)*x
 
     def S(self, x):
+        """
+        Calculate S(x)
+
+        Parameters
+        -----------
+
+        x : float
+          constant given as mc^2/kT
+
+        Returns
+        -------
+        Solved S(x) value
+        """
         inter = float(intp.quad(self.inteS_x, 0, np.inf, args=(x,))[0])
         return 1 + inter*45/(2*np.pi**4)
 
     def x(self, T):
+        """
+        Calculate x(T)
+
+        Parameters
+        -----------
+
+        T : float
+
+        Returns
+        -------
+        x(T)
+        """
         return self.m*self.c**2/(self.kb*T)
 
     def t_vals(self, T):
+        """
+        Calculate t(s)
+
+        Parameters
+        -----------
+
+        T : float
+          Temperature [K]
+
+        Returns
+        -------
+        Array of time values
+        """
         x_vals = self.x(T)
         x0 = x_vals[0]
         const = np.sqrt((15 * self.hbar**3)\
@@ -69,10 +165,26 @@ class TemperatureTable:
         return const*results
 
     def T_neut(self, T):
+        """
+        Calculate T_neutrino
+
+        Parameters
+        -----------
+
+        T : float
+          Temperature T [K]
+
+        Returns
+        -------
+        T_neutrino value
+        """
         T_neu_val = (4/11)**(1/3)*T*self.S(self.x(T))**(1/3)
         return T_neu_val
 
     def calc_and_print(self):
+        """
+        Calculate T_neutrino, t(s) and print table
+        """
 
         self.t = self.t_vals(self.Temp)
 
@@ -89,7 +201,9 @@ class TemperatureTable:
                           self.t[i]))
 
     def plots(self):
-
+        """
+        Plot S(x) and T_neutrino/T (T)
+        """
         plt.scatter(self.x(self.Temp), self.Splot, label="S(x)")
         plt.legend()
         plt.xlabel("X=m_ec^2/k_BT")
@@ -108,6 +222,7 @@ class TemperatureTable:
 
 if __name__ == "__main__":
 
+    #Test temperatures
     T = np.array([1e11, 6e10, 2e10,
                   1e10, 6e9, 3e9,
                   2e9, 1e9, 3e8,
@@ -115,9 +230,13 @@ if __name__ == "__main__":
 
     calcis = TemperatureTable(T)
     anal_x0 = 1 + 45/(2*np.pi**4)*7*np.pi**4/120
-    print("For x = 0, model gives {} and analytical gives {}".format(calcis.S(0), anal_x0))
-    print("For x >> 1, model gives {} and analytical gives {}".format(calcis.S(50), 1.))
 
+    #Check model for x = 0 and x >> 1
+    print("For x = 0, model gives {} and analytical gives {}"\
+          .format(calcis.S(0), anal_x0))
+    print("For x >> 1, model gives {} and analytical gives {}"\
+          .format(calcis.S(50), 1.))
 
+    #Find values for T_neutrino and t(s)
     calcis.calc_and_print()
     calcis.plots()
