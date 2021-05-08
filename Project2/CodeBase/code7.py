@@ -229,7 +229,7 @@ if __name__ == "__main__":
                   1e8, 1e7, 1e6])
 
     calcis = TemperatureTable(T)
-    anal_x0 = 1 + 45/(2*np.pi**4)*7*np.pi**4/120
+    anal_x0 = 1 + 45/(2*np.pi**4)*4/3*7*np.pi**4/120
 
     #Check model for x = 0 and x >> 1
     print("For x = 0, model gives {} and analytical gives {}"\
