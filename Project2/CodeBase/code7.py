@@ -188,6 +188,7 @@ class TemperatureTable:
 
         self.t = self.t_vals(self.Temp)
 
+        print("                                     ")
         print("     T       T_n/T       t      ")
         print("-------------------------------------")
 
@@ -204,10 +205,10 @@ class TemperatureTable:
         """
         Plot S(x) and T_neutrino/T (T)
         """
-        plt.scatter(self.x(self.Temp), self.Splot, label="S(x)")
+        plt.scatter(np.log10(self.x(self.Temp)), self.Splot, label="S(x)")
         plt.legend()
-        plt.xlabel("X=m_ec^2/k_BT")
-        plt.ylabel("S(X=m_ec^2/k_BT)")
+        plt.xlabel(r"$log_{10}(X=m_ec^2/k_BT)$")
+        plt.ylabel(r"$S(X=m_ec^2/k_BT)$")
         plt.savefig("Images/s_x.jpeg")
         plt.show()
 
@@ -232,9 +233,9 @@ if __name__ == "__main__":
     anal_x0 = 1 + 45/(2*np.pi**4)*4/3*7*np.pi**4/120
 
     #Check model for x = 0 and x >> 1
-    print("For x = 0, model gives {} and analytical gives {}"\
+    print("For x = 0, model gives {:.3f} and analytical gives {:.3f}"\
           .format(calcis.S(0), anal_x0))
-    print("For x >> 1, model gives {} and analytical gives {}"\
+    print("For x >> 1, model gives {:.3f} and analytical gives {:.3f}"\
           .format(calcis.S(50), 1.))
 
     #Find values for T_neutrino and t(s)
