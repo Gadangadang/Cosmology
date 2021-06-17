@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as intp
 from scipy import constants
-from scipy.misc import derivative
+import scipy.misc
 
 
 
@@ -25,7 +25,7 @@ class TemperatureTable:
         self.t = np.zeros_like(self.Temp)
         self.Splot = np.zeros_like(self.Temp)
 
-    def inteS_x(self, y, x):
+    def inside_integral_S(self, y, x):
         """
         Algebraic expression inside integral in S(x)
 
@@ -45,7 +45,7 @@ class TemperatureTable:
                / ( 3 * np.sqrt( x**2 + y**2 ))) \
                / ( np.exp( np.sqrt( x**2 + y**2 )) + 1 )
 
-    def inteE_x(self, y, x):
+    def inside_integral_E(self, y, x):
         """
         Algebraic expression inside integral in E(x)
 
@@ -65,7 +65,7 @@ class TemperatureTable:
                / (np.exp( np.sqrt(x**2 + y**2) ) + 1)
 
 
-    def epsilon(self, x):
+    def find_epsilon(self, x):
         """
         Calculate E(x)
 
@@ -79,15 +79,15 @@ class TemperatureTable:
         -------
         Solved integral
         """
-        epint = 30/np.pi**4 * float(intp.quad(self.inteE_x,
+        epint = 30/np.pi**4 * float(intp.quad(self.inside_integral_E,
                                               0,
                                               np.inf,
                                               args=(x,))[0])
 
-        epsi = 1 + 21/8 * (4/11)**(4/3) * self.S(x)**(4/3) + epint
+        epsi = 1 + 21/8 * (4/11)**(4/3) * self.find_S_of_x(x)**(4/3) + epint
         return epsi
 
-    def t_int_x(self, x):
+    def inside_integral_t(self, x):
         """
         Algebraic expression inside integral in t(s)
 
@@ -101,10 +101,10 @@ class TemperatureTable:
         -------
         Expression
         """
-        return (3 - x*derivative(self.S,x)\
-                /self.S(x))*self.epsilon(x)**(-1/2)*x
+        return (3 - x*scipy.misc.derivative(self.find_S_of_x, x)\
+                /self.find_S_of_x(x))*self.find_epsilon(x)**(-1/2)*x
 
-    def S(self, x):
+    def find_S_of_x(self, x):
         """
         Calculate S(x)
 
@@ -118,10 +118,14 @@ class TemperatureTable:
         -------
         Solved S(x) value
         """
-        inter = float(intp.quad(self.inteS_x, 0, np.inf, args=(x,))[0])
+        inter = float(intp.quad(self.inside_integral_S,
+                                0,
+                                np.inf,
+                                args=(x,))[0])
+
         return 1 + inter*45/(2*np.pi**4)
 
-    def x(self, T):
+    def find_x_of_T(self, T):
         """
         Calculate x(T)
 
@@ -136,7 +140,7 @@ class TemperatureTable:
         """
         return self.m*self.c**2/(self.kb*T)
 
-    def t_vals(self, T):
+    def find_t_of_s(self, T):
         """
         Calculate t(s)
 
@@ -150,7 +154,7 @@ class TemperatureTable:
         -------
         Array of time values
         """
-        x_vals = self.x(T)
+        x_vals = self.find_x_of_T(T)
         x0 = x_vals[0]
         const = np.sqrt((15 * self.hbar**3)\
                          / (24 * np.pi**3 * self.G \
@@ -160,11 +164,11 @@ class TemperatureTable:
         results = np.zeros(xlength)
 
         for i,xi in enumerate(x_vals):
-            results[i] = intp.quad(self.t_int_x, x0, xi)[0]
+            results[i] = intp.quad(self.inside_integral_t, x0, xi)[0]
 
         return const*results
 
-    def T_neut(self, T):
+    def find_neutrino_temperature(self, T):
         """
         Calculate T_neutrino
 
@@ -178,7 +182,8 @@ class TemperatureTable:
         -------
         T_neutrino value
         """
-        T_neu_val = (4/11)**(1/3)*T*self.S(self.x(T))**(1/3)
+        T_neu_val = (4/11)**(1/3)*T\
+                    *self.find_S_of_x(self.find_x_of_T(T))**(1/3)
         return T_neu_val
 
     def calc_and_print(self):
@@ -186,15 +191,15 @@ class TemperatureTable:
         Calculate T_neutrino, t(s) and print table
         """
 
-        self.t = self.t_vals(self.Temp)
+        self.t = self.find_t_of_s(self.Temp)
 
         print("                                     ")
         print("     T       T_n/T       t      ")
         print("-------------------------------------")
 
         for i in range(len(self.Temp-1)):
-            self.T_neutrino[i] = self.T_neut(self.Temp[i])
-            self.Splot[i] = self.S(self.x(self.Temp[i]))
+            self.T_neutrino[i] = self.find_neutrino_temperature(self.Temp[i])
+            self.Splot[i] = self.find_S_of_x(self.find_x_of_T(self.Temp[i]))
 
             print("{:.2e}  |  {:.5f}  |  {:.4e} "\
                   .format(self.Temp[i],
@@ -205,14 +210,18 @@ class TemperatureTable:
         """
         Plot S(x) and T_neutrino/T (T)
         """
-        plt.scatter(np.log10(self.x(self.Temp)), self.Splot, label="S(x)")
+        plt.scatter(np.log10(self.find_x_of_T(self.Temp)),
+                    self.Splot,
+                    label="S(x)")
         plt.legend()
         plt.xlabel(r"$log_{10}(X=m_ec^2/k_BT)$")
         plt.ylabel(r"$S(X=m_ec^2/k_BT)$")
         plt.savefig("Images/s_x.jpeg")
         plt.show()
 
-        plt.plot(self.Temp, self.T_neutrino/self.Temp, label=r"$T_{\nu}/T$")
+        plt.plot(self.Temp,
+                 self.T_neutrino/self.Temp,
+                 label=r"$T_{\nu}/T$")
         plt.legend()
         plt.xlabel("T[K]")
         plt.ylabel(r"$T_{\nu}/T$")
@@ -234,9 +243,9 @@ if __name__ == "__main__":
 
     #Check model for x = 0 and x >> 1
     print("For x = 0, model gives {:.3f} and analytical gives {:.3f}"\
-          .format(calcis.S(0), anal_x0))
+          .format(calcis.find_S_of_x(0), anal_x0))
     print("For x >> 1, model gives {:.3f} and analytical gives {:.3f}"\
-          .format(calcis.S(50), 1.))
+          .format(calcis.find_S_of_x(50), 1.))
 
     #Find values for T_neutrino and t(s)
     calcis.calc_and_print()
